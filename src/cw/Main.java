@@ -17,6 +17,7 @@ public class Main {
         String name;
         String affiliation;
 
+
         while (x) {
             System.out.println("(D)isplay, (P)ut, (G)et, (C)ontains, (S)ize, (R)emove, (Q)uit?");
             char command = input.next().charAt(0);
@@ -26,21 +27,22 @@ public class Main {
                     hashTable.displayDB();
                     break;
                 case 'P':       //Completed
-                    System.out.println("Enter surname of new delegate: ");
+                    System.out.println("Enter name of new delegate: ");
                     name = input.next();
                     System.out.println("Enter affiliation of new delegate: ");
-                    affiliation = input.next();
+                    input.nextLine();
+                    affiliation = input.nextLine();
                     delegate = new Delegate(name, affiliation);
                     hashTable.put(delegate);
                     break;
                 case 'G':   //Completed
-                    System.out.println("Enter delegate surname to get: ");
+                    System.out.println("Enter delegate name to get: ");
                     name = input.next();
                     delegate = hashTable.get(name);
                     System.out.println(delegate.toString());
                     break;
                 case 'C':   //Completed
-                    System.out.println("Enter delegate surname to find: ");
+                    System.out.println("Enter delegate name to find: ");
                     name = input.next();
                     if (hashTable.containsName(name))
                         System.out.println("The hashtable contains this person");
@@ -51,10 +53,10 @@ public class Main {
                     System.out.println("There are " + hashTable.size() + " delegates registered");
                     break;
                 case 'R':
-                    /*
-                    System.out.println("Enter delegate surname to get: ");
-                    name = input.next();*/
-                    System.out.println("Remove");
+                    System.out.println("Enter delegate name to remove: ");
+                    name = input.next();
+                    hashTable.remove(name);
+                    System.out.println(name + " removed");
                     break;
                 case 'Q':   //Completed
                     System.out.println("Closing program");

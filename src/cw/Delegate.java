@@ -8,10 +8,12 @@ public class Delegate implements IDelegate {
     private String name;
     private String affiliation;
     private int key;
+    private boolean isDeleted;
 
     public Delegate(String name, String affiliation) {
         this.name = name;
         this.affiliation = affiliation;
+        this.isDeleted = false;
     }
 
     ////////////////////////////////////////////
@@ -25,7 +27,11 @@ public class Delegate implements IDelegate {
     }
 
     public int getKey() { return this.key; }
-    public void setket(int key) { this.key = key; }
+    public void setKey(int key) { this.key = key; }
+    public boolean getIsDeleted() { return this.isDeleted; }
+    public void setIsDeleted() {
+        this.isDeleted = !this.isDeleted;
+    }
 
     @Override
     public String toString() {
