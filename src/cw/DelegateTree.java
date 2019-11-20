@@ -16,11 +16,11 @@ public class DelegateTree implements IDelegateDB {
     }
 
     private Node root;
-    private int numEntries;
+    private int numDelegates;
 
     public DelegateTree() {
         this.root = null;
-        this.numEntries = 0;
+        this.numDelegates = 0;
     }
 
     private Node addBranch (Node tree, Delegate delegate) {
@@ -31,6 +31,17 @@ public class DelegateTree implements IDelegateDB {
         else if (delegate.getName().compareTo(tree.data.getName()) > 0)    //New value is greater than currently selected node
             tree.right = addBranch(tree.right, delegate);
         return tree;
+    }
+
+    private Node getBranch (Node tree, String name) {
+        if (name.compareTo(tree.data.getName()) == 0)
+            return tree;
+        else if (name.compareTo(tree.data.getName()) < 0)
+            return getBranch(tree.left, name);
+        else if (name.compareTo(tree.data.getName()) > 0)
+            return getBranch(tree.right, name);
+        else
+            return null;
     }
 
     //IMPLEMENTED METHODS
@@ -46,23 +57,28 @@ public class DelegateTree implements IDelegateDB {
 
     @Override
     public Delegate get(String name) {
-        return null;
+        assert name != null && !name.equals("");    //@pre name not null or empty string
+
+        Node getTree = getBranch(this.root, name);
+        return getTree.data;
     }
 
     @Override
     public int size() {
-        return 0;
+        return numDelegates;
     }
 
     @Override
     public boolean isEmpty() {
-        return false;
+        return numDelegates == 0;
     }
 
     @Override
     public Delegate put(Delegate delegate) {
+        assert delegate != null;    //@pre delegate not null
+
         this.root = addBranch(this.root, delegate);
-        this.numEntries++;
+        this.numDelegates++;
         return null;
     }
 

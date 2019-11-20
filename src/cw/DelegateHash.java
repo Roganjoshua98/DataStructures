@@ -76,6 +76,8 @@ public class DelegateHash implements IDelegateDB {
 
     @Override
     public boolean containsName(String name) {
+        assert name != null && !name.equals("");    //@pre name not null or empty string
+
         if (get(name) == null)
             return false;
         else
@@ -84,6 +86,8 @@ public class DelegateHash implements IDelegateDB {
 
     @Override
     public Delegate get(String name) {  //Complete
+        assert name != null && !name.equals("");    //@pre name not null or empty string
+
         int key = hash(name);
         int probeStart = key;
         int i = 1;
@@ -114,10 +118,10 @@ public class DelegateHash implements IDelegateDB {
 
     @Override
     public Delegate put(Delegate delegate) {
-        assert numDelegates != this.range;
-        assert delegate != null;
+        assert numDelegates != this.range;  //@pre array not full
+        assert delegate != null;    //@pre delegate not null
         String name = delegate.getName();
-        assert name != null && !name.contains("");
+        assert name != null && !name.equals("");    //@pre name not null or empty string
 
         int key = hash(name);
         //Quadratic Probing
@@ -145,6 +149,8 @@ public class DelegateHash implements IDelegateDB {
 
     @Override
     public Delegate remove(String name) {
+        assert name != null && !name.equals("");    //@pre name not null or empty string
+
         Delegate delegate = get(name);
         delegate.setIsDeleted();
         numDelegates--;
@@ -152,12 +158,11 @@ public class DelegateHash implements IDelegateDB {
     }
 
     @Override
-    public void displayDB() {   //Doesn't sort alphabetically, otherwise complete
+    public void displayDB() {   //Doesn't sort alphabetically, will add later
         if (this.numDelegates == 0) {
             System.out.println("Database is currently empty");
             return;
         }
-        ArrayList<String> disaplyList = new ArrayList<>();
         for (Delegate delegate : this.delegates) {
             if (delegate != null) {
                 System.out.println(delegate.toString());

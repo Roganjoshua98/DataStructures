@@ -97,7 +97,13 @@ public class Main {
                         binarySearchTree.put(delegate);
                         break;
                     case 'G':
-                        System.out.println("Get");
+                        System.out.println("Enter delegate name to get: ");
+                        name = input.next();
+                        delegate = binarySearchTree.get(name);
+                        if (delegate == null)
+                            System.out.println("The delegate you tried to get does not exist");
+                        else
+                            System.out.println(delegate.toString());
                         break;
                     case 'C':
                         System.out.println("Contains");
