@@ -9,7 +9,7 @@ import java.lang.*;
 
 public class Main {
     public static void main(String args[]) {
-        final int range = 10;
+        final int range = 4;
         DelegateHash hashTable = new DelegateHash(range);
         Delegate delegate;
         Scanner input = new Scanner(System.in);
@@ -27,6 +27,7 @@ public class Main {
                     hashTable.displayDB();
                     break;
                 case 'P':       //Completed
+                    hashTable = hashTable.checkResize();
                     System.out.println("Enter name of new delegate: ");
                     name = input.next();
                     System.out.println("Enter affiliation of new delegate: ");
@@ -39,7 +40,10 @@ public class Main {
                     System.out.println("Enter delegate name to get: ");
                     name = input.next();
                     delegate = hashTable.get(name);
-                    System.out.println(delegate.toString());
+                    if (delegate == null)
+                        System.out.println("The delegate you tried to get does not exist");
+                    else
+                        System.out.println(delegate.toString());
                     break;
                 case 'C':   //Completed
                     System.out.println("Enter delegate name to find: ");

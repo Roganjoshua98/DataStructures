@@ -12,11 +12,13 @@ public class DelegateHash implements IDelegateDB {
     private Delegate[] delegates;
     private final int range;
     private int numDelegates;
+    private double loadFactor;
 
     public DelegateHash(int range) {
         this.range = range;
-        delegates = new Delegate[this.range];
-        clearDB();
+        this.loadFactor = 0;
+        this.numDelegates = 0;
+        delegates = new Delegate[this.range-1];
     }
 
     private int hash (String name) {    //Complete
@@ -44,20 +46,40 @@ public class DelegateHash implements IDelegateDB {
         return key;
     }
 
-    private void resize() {
+    public DelegateHash checkResize() {
+        this.loadFactor = (double)this.numDelegates / (double)this.range;
+        if (loadFactor > 0.5)
+            return resize();
+        else
+            return this;
+    }
 
+    private DelegateHash resize() {
+        int newRange = this.range * 2;
+        DelegateHash newHashTable = new DelegateHash(newRange);
+        for (Delegate d : this.delegates) {
+            if (d != null && !d.getIsDeleted())
+                newHashTable.put(d);
+        }
+        return newHashTable;
     }
 
     ////////////////////////////////////////////
     //cw.IDelegateDB methods
     @Override
     public void clearDB() { //Complete
+        for (Delegate d : this.delegates)
+            if (d != null)
+                remove(d.getName());
         numDelegates = 0;
     }
 
     @Override
     public boolean containsName(String name) {
-        return (get(name).getName().equals(name));
+        if (get(name) == null)
+            return false;
+        else
+            return (get(name).getName().equals(name));
     }
 
     @Override
@@ -65,6 +87,8 @@ public class DelegateHash implements IDelegateDB {
         int key = hash(name);
         int probeStart = key;
         int i = 1;
+        if (delegates[key] == null)
+            return null;
         Delegate delegate = delegates[key];
         while (!delegates[key].getName().equals(name)) {  //Cycles one by one through the list to find an empty spot
             if (delegates[key].getIsDeleted()) {    //If space is marked to be deleted, abort
@@ -135,9 +159,11 @@ public class DelegateHash implements IDelegateDB {
         }
         ArrayList<String> disaplyList = new ArrayList<>();
         for (Delegate delegate : this.delegates) {
-            System.out.println(delegate.toString());
-            System.out.println("Hash Key: " + delegate.getKey());
-            System.out.println("------------------------");
+            if (delegate != null) {
+                System.out.println(delegate.toString());
+                System.out.println("Hash Key: " + delegate.getKey());
+                System.out.println("------------------------");
+            }
         }
         System.out.println("Total number of delegates: " + this.numDelegates);
     }
