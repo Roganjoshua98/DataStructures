@@ -30,7 +30,7 @@ public class Delegate implements IDelegate {
     public void setKey(int key) { this.key = key; }
     public boolean getIsDeleted() { return this.isDeleted; }
     public void setIsDeleted() {
-        this.isDeleted = !this.isDeleted;
+        this.isDeleted = true;
     }
 
     @Override

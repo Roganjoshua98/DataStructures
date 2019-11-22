@@ -18,17 +18,17 @@ public class DelegateHash implements IDelegateDB {
         this.range = range;
         this.loadFactor = 0;
         this.numDelegates = 0;
-        delegates = new Delegate[this.range-1];
+        delegates = new Delegate[this.range];
     }
 
     private int hash (String name) {    //Complete
-        name = name.toUpperCase();
         assert name != null && !name.equals("");
+        name = name.toUpperCase();
 
         int key = 0;
         for (int i = 0; i < name.length(); i++) {
             if (i % 5 == 0)
-                key += (int)Math.pow((double)i, (double)name.charAt(i));
+                key += (int)Math.pow(i, name.charAt(i));
             else if (i % 2 == 0)
                 key += i * (int) name.charAt(i);
             else
@@ -55,12 +55,17 @@ public class DelegateHash implements IDelegateDB {
     }
 
     private DelegateHash resize() {
+        System.out.println("~~STARTLOG~~");
+        System.out.println("Load factor exceeded 0.5, resizing!");
+        System.out.println("Old range: " + this.range);
         int newRange = this.range * 2;
         DelegateHash newHashTable = new DelegateHash(newRange);
         for (Delegate d : this.delegates) {
             if (d != null && !d.getIsDeleted())
                 newHashTable.put(d);
         }
+        System.out.println("New range: " + newRange);
+        System.out.println("~~ENDLOG~~");
         return newHashTable;
     }
 
@@ -89,21 +94,30 @@ public class DelegateHash implements IDelegateDB {
         assert name != null && !name.equals("");    //@pre name not null or empty string
 
         int key = hash(name);
+        System.out.println("~~STARTLOG~~");
+        System.out.println("Getting delegate " + name);
+        System.out.println("Hash value " + key);
         int probeStart = key;
         int i = 1;
         if (delegates[key] == null)
             return null;
         Delegate delegate = delegates[key];
         while (!delegates[key].getName().equals(name)) {  //Cycles one by one through the list to find an empty spot
-            if (delegates[key].getIsDeleted()) {    //If space is marked to be deleted, abort
-                delegate = null;
-                break;
-            }
+            System.out.println("Visited index " + key);
             key = (int)((probeStart+Math.pow(i, 2)) % range);
             i++;
             delegate = delegates[key];
         }
-        return delegate;
+        if (delegates[key].getIsDeleted()) {    //If space is marked to be deleted, abort
+            System.out.println("Index " + key + " marked for deletion");
+            System.out.println("~~ENDLOG~~");
+            return null;
+        }
+        else {
+            System.out.println("Retrieved at index " + key);
+            System.out.println("~~ENDLOG~~");
+            return delegate;
+        }
     }
 
     @Override
@@ -124,11 +138,15 @@ public class DelegateHash implements IDelegateDB {
         assert name != null && !name.equals("");    //@pre name not null or empty string
 
         int key = hash(name);
+        System.out.println("~~STARTLOG~~");
+        System.out.println("Putting delegate " + name);
+        System.out.println("Hash value " + key);
         //Quadratic Probing
         int probeStart = key;
         int i = 1;
         Delegate previous = null;
         while (delegates[key] != null) {  //Cycles one by one through the list to find an empty spot
+            System.out.println("Visited index " + key);
             if (delegates[key].getName().equals(name)) {    //If duplicate found, replace
                 this.numDelegates--; //Counterbalance numdelegates++ later on
                 previous = delegates[key];
@@ -144,6 +162,8 @@ public class DelegateHash implements IDelegateDB {
         delegates[key] = delegate;
         delegate.setKey(key);
         this.numDelegates++;
+        System.out.println("Placed at index " + key);
+        System.out.println("~~ENDLOG~~");
         return previous;
     }
 
@@ -151,8 +171,12 @@ public class DelegateHash implements IDelegateDB {
     public Delegate remove(String name) {
         assert name != null && !name.equals("");    //@pre name not null or empty string
 
+        System.out.println("~~STARTLOG~~");
+        System.out.println("Removing delegate " + name);
         Delegate delegate = get(name);
         delegate.setIsDeleted();
+        System.out.println(name + " deleted");
+        System.out.println("~~ENDLOG~~");
         numDelegates--;
         return delegate;
     }
