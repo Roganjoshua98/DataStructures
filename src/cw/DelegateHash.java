@@ -37,18 +37,13 @@ public class DelegateHash implements IDelegateDB {
         key *= name.length();
         key = Math.abs(key);
         key = key % this.range;
-
-        /*/PURELY FOR TESTING
-        char c = name.charAt(0);
-        int key = c-5;
-        key = key % this.range;*/
-
         return key;
     }
 
     public DelegateHash checkResize() {
         this.loadFactor = (double)this.numDelegates / (double)this.range;
-        if (loadFactor > 0.5)
+        System.out.println("Load Factor: " + this.loadFactor);
+        if (loadFactor >= 0.5)
             return resize();
         else
             return this;
@@ -91,7 +86,7 @@ public class DelegateHash implements IDelegateDB {
 
     @Override
     public Delegate get(String name) {  //Complete
-        assert name != null && !name.equals("");    //@pre name not null or empty string
+        assert name != null && !name.equals("");     //@pre name not null or empty string
 
         int key = hash(name);
         System.out.println("~~STARTLOG~~");
@@ -102,18 +97,24 @@ public class DelegateHash implements IDelegateDB {
         if (delegates[key] == null)
             return null;
         Delegate delegate = delegates[key];
-        while (!delegates[key].getName().equals(name)) {  //Cycles one by one through the list to find an empty spot
-            System.out.println("Visited index " + key);
-            key = (int)((probeStart+Math.pow(i, 2)) % range);
-            i++;
-            delegate = delegates[key];
+
+        //Quadratic Probing
+        try {
+            while (!delegates[key].getName().equals(name)) {  //Cycles quadratically through the list until delegate is found
+                System.out.println("Visited index " + key);
+                key = (probeStart + (i * i)) % this.range;
+                i++;
+                delegate = delegates[key];
+            }
+        } catch(Exception e){
+            System.out.println("Delegate cannot be found");
+            return null;
         }
         if (delegates[key].getIsDeleted()) {    //If space is marked to be deleted, abort
             System.out.println("Index " + key + " marked for deletion");
             System.out.println("~~ENDLOG~~");
             return null;
-        }
-        else {
+        } else {
             System.out.println("Retrieved at index " + key);
             System.out.println("~~ENDLOG~~");
             return delegate;
@@ -141,6 +142,7 @@ public class DelegateHash implements IDelegateDB {
         System.out.println("~~STARTLOG~~");
         System.out.println("Putting delegate " + name);
         System.out.println("Hash value " + key);
+
         //Quadratic Probing
         int probeStart = key;
         int i = 1;
@@ -156,9 +158,10 @@ public class DelegateHash implements IDelegateDB {
                 previous = delegates[key];
                 break;
             }
-            key = (int)(probeStart + Math.pow(i,2)) % this.range;
+            key = (probeStart + (i*i)) % this.range;
             i++;
         }
+
         delegates[key] = delegate;
         delegate.setKey(key);
         this.numDelegates++;
@@ -174,6 +177,8 @@ public class DelegateHash implements IDelegateDB {
         System.out.println("~~STARTLOG~~");
         System.out.println("Removing delegate " + name);
         Delegate delegate = get(name);
+        if (delegate == null)
+            return delegate;
         delegate.setIsDeleted();
         System.out.println(name + " deleted");
         System.out.println("~~ENDLOG~~");
@@ -182,7 +187,7 @@ public class DelegateHash implements IDelegateDB {
     }
 
     @Override
-    public void displayDB() {   //Doesn't sort alphabetically, will add later
+    public void displayDB() {   //TODO: sort alphabetically
         if (this.numDelegates == 0) {
             System.out.println("Database is currently empty");
             return;

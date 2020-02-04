@@ -147,9 +147,10 @@ public class DelegateTree implements IDelegateDB {
         Node tree = getBranch(this.root, name);
         System.out.println("~~ENDLOG~~");
         Delegate delegate;
-        if (tree == null)
+        if (tree == null || !tree.data.getName().equals(name)) {  //If tree is empty or name is not present
+            System.out.println("Delegate not present in tree");
             return null;
-        else {
+        } else {
             Node parent = tree.parent;
             delegate = tree.data;
             System.out.println("~~STARTLOG~~");

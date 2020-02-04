@@ -1,5 +1,8 @@
 package cw;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.Scanner;
 import java.lang.*;
 
@@ -8,7 +11,7 @@ import java.lang.*;
  */
 
 public class Main {
-    public static void main(String args[]) {
+    public static void main(String args[]) throws IOException {
         Scanner input = new Scanner(System.in);
         Delegate delegate;
         String name;
@@ -23,12 +26,23 @@ public class Main {
 
         boolean x = true;
         if (mode == 1) { //HASH TABLE INTERFACE
-            final int range = 3;
+            final int range = 3000;
             DelegateHash hashTable = new DelegateHash(range);
             System.out.println("~~STARTLOG~~");
             System.out.println("Hash table created");
             System.out.println("Starting range: " + range);
             System.out.println("~~ENDLOG~~");
+
+            /*FOR TESTING*/
+            try (BufferedReader br = new BufferedReader(new FileReader("C:\\Users\\joshu\\IdeaProjects\\DSaA_cw\\doc\\UKDelegates.csv"))) {
+                String line;
+                while ((line = br.readLine()) != null) {
+                    String[] values = line.split(",");
+                    hashTable.checkResize();
+                    hashTable.put(new Delegate(values[0], values[1]));
+                }
+            }
+
             while (x) {
                 System.out.println("(D)isplay, (P)ut, (G)et, (C)ontains, (S)ize, (R)emove, (Q)uit?");
                 char command = Character.toUpperCase(input.next().charAt(0));
@@ -84,6 +98,16 @@ public class Main {
 
         else {
             DelegateTree binarySearchTree = new DelegateTree();
+
+            /*FOR TESTING*/
+            try (BufferedReader br = new BufferedReader(new FileReader("doc/UKDelegates.csv"))) {
+                String line;
+                while ((line = br.readLine()) != null) {
+                    String[] values = line.split(",");
+                    binarySearchTree.put(new Delegate(values[0], values[1]));
+                }
+            }
+
             while (x) { //BINARY SEARCH TREE INTERFACE
                 System.out.println("(D)isplay, (P)ut, (G)et, (C)ontains, (S)ize, (R)emove, (Q)uit?");
                 char command = Character.toUpperCase(input.next().charAt(0));
@@ -122,8 +146,9 @@ public class Main {
                     case 'R':
                         System.out.println("Enter delegate name to remove: ");
                         name = input.next();
-                        binarySearchTree.remove(name);
-                        System.out.println(name + " removed");
+                        delegate = binarySearchTree.remove(name);
+                        if (delegate != null)
+                            System.out.println(name + " removed");
                         break;
                     case 'Q':
                         System.out.println("Closing program");
